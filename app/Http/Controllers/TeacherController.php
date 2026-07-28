@@ -42,7 +42,16 @@ class TeacherController extends Controller
 
     return $teach;
     }
-    
+     public function index(){
+
+    $teachers = Teacher::all();
+    return view('teacher.index',compact('teachers'));
+
+    }
+    public function show($id){
+    $teacher = Teacher::find($id);
+    return view ('teacher.show', compact('teacher'));
+}
 
 }
 

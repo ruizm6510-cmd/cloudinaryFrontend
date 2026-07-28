@@ -45,4 +45,17 @@ class CourseController extends Controller
 
     return $course;
     }
+
+    public function index(){
+
+    $courses = Course::all();
+    return view('course.index',compact('courses'));
+
+    }
+
+    public function show($id){
+    $curso = Course::find($id);
+    return view ('course.show', compact('curso'));
+}
+
 }
