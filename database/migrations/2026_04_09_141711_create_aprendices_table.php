@@ -26,6 +26,7 @@ return new class extends Migration
             $table->foreign('computer_id')
                 ->references('id')
                 ->on('computers')->onDelete('set null');
+                $table->string('urlFoto')->nullable();
             $table->timestamps();
         });
     }

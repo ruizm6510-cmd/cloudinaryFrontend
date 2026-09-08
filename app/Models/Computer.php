@@ -14,4 +14,8 @@ class Computer extends Model
         return $this->hasOne(Aprendice::class);
     }
      protected $fillable=['number','brand'];
+
+      protected $guarded = [
+        'urlFoto'
+    ];
 }

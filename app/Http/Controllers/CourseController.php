@@ -9,53 +9,92 @@ use App\Models\Training_center;
 
 class CourseController extends Controller
 {
-    public function consultaArea(){
+    public function consultaArea()
+    {
         $curso = Course::find(2);
+
         return $curso->area;
     }
 
-    public function consultaCentro(){
+    public function consultaCentro()
+    {
         $curso = Course::find(1);
+
         return $curso->training_center;
     }
 
-    public function consultaAprendiz(){
+    public function consultaAprendiz()
+    {
         $curso = Course::find(1);
+
         return $curso->aprendices;
     }
 
-    public function consultaProfe(){
+    public function consultaProfe()
+    {
         $curso = Course::find(1);
+
         return $curso->teachers;
     }
 
-    public function create (){
-        $areas= Area::all();
-        $centers= Training_center::all();
-     return view('course.create', compact('areas','centers'));
+    // Formulario para crear curso
+    public function create()
+    {
+        $areas = Area::all();
+        $centers = Training_center::all();
 
-
+        return view('course.create', compact('areas', 'centers'));
     }
 
-    public function store(Request $request){
+    // Guardar curso
+    public function store(Request $request)
+    {
+        $course = Course::create($request->all());
 
-    $course = new Course();
-
-     $course=Course::create($request->all());
-
-    return $course;
+        return redirect()->route('course.list');
     }
 
-    public function index(){
+    // Lista de cursos
+    public function index()
+    {
+        $courses = Course::all();
 
-    $courses = Course::all();
-    return view('course.index',compact('courses'));
-
+        return view('course.index', compact('courses'));
     }
 
-    public function show($id){
-    $curso = Course::find($id);
-    return view ('course.show', compact('curso'));
-}
+    // Mostrar curso
+    public function show($id)
+    {
+        $curso = Course::find($id);
 
+        return view('course.show', compact('curso'));
+    }
+
+    // Editar curso
+    public function edit(Course $course)
+    {
+        $areas = Area::all();
+        $centers = Training_center::all();
+
+        return view(
+            'course.edit',
+            compact('course', 'areas', 'centers')
+        );
+    }
+
+    // Actualizar curso
+    public function update(Request $request, Course $course)
+    {
+        $course->update($request->all());
+
+        return redirect()->route('course.list');
+    }
+
+    // Eliminar curso
+    public function destroy(Course $course)
+    {
+        $course->delete();
+
+        return redirect()->route('course.list');
+    }
 }

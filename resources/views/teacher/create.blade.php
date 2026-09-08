@@ -2,9 +2,9 @@
 
 @section('content')
 
-<h1>formulario area</h1>
+<h1>formulario profesor</h1>
 
-<form action="{{route('teacher.store')}}" method="POST" enctype="multipart/form-data">
+<form action="{{ route('teacher.store') }}" method="POST" enctype="multipart/form-data">
 
 @csrf
 
@@ -13,6 +13,7 @@
     <br>
     <input type="text" name="name">
 </label>
+
 <br>
 <br>
 
@@ -21,38 +22,52 @@
     <br>
     <input type="email" name="email">
 </label>
+
 <br>
 <br>
 
-<label for="course_id">Area</label>
+<label for="area_id">Area</label>
 
-    <select name="area_id" id="area_id" class="form-control">
-        <option value="">Seleccione un profesor</option>
+<select name="area_id" id="area_id" class="form-control">
 
-        @foreach($areas as $area)
-            <option value="{{ $area->id }}">
-                {{ $area->name }}
-            </option>
-        @endforeach
-    </select>
+    <option value="">Seleccione un area</option>
+
+    @foreach($areas as $area)
+
+        <option value="{{ $area->id }}">
+            {{ $area->name }}
+        </option>
+
+    @endforeach
+
+</select>
+
 <br>
 <br>
 
-<label for="training_center_id">TrainingCenter</label>
+<label for="training_center_id">Training Center</label>
 
-    <select name="training_center_id" id="training_center_id" class="form-control">
-        <option value="">Seleccione un centro</option>
+<select name="training_center_id" id="training_center_id" class="form-control">
 
-        @foreach($centers as $center)
-            <option value="{{ $center->id }}">
-                {{ $center->name }}
-            </option>
-        @endforeach
-    </select>
+    <option value="">Seleccione un centro</option>
+
+    @foreach($training_centers as $training_center)
+
+        <option value="{{ $training_center->id }}">
+            {{ $training_center->name }}
+        </option>
+
+    @endforeach
+
+</select>
+
 <br>
 <br>
 
-<button type="submit">Enviar Formulario:</button>
+<button type="submit">
+    Enviar Formulario:
+</button>
+
 </form>
 
 @endsection

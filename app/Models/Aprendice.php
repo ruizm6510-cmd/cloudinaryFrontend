@@ -19,4 +19,8 @@ class Aprendice extends Model
         return $this->belongsTo(Computer::class);
     }
      protected $fillable=['name','email','cell_number','course_id','computer_id'];
+
+     protected $guarded = [
+        'urlFoto'
+    ];
 }

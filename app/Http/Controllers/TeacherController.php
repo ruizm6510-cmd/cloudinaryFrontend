@@ -4,57 +4,97 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Teacher;
-use App\Models\Training_center;
 use App\Models\Area;
+use App\Models\Training_center;
 
 class TeacherController extends Controller
 {
-    // muestra que area da un profesor
-    public function consultaArea(){
+    // Muestra qué área da un profesor
+    public function consultaArea()
+    {
         $profe = Teacher::find(1);
+
         return $profe->area;
     }
-    // muestra en que centro se encuentra el profesor
-    public function consultaCentro(){
+
+    // Muestra en qué centro se encuentra el profesor
+    public function consultaCentro()
+    {
         $profe = Teacher::find(1);
+
         return $profe->training_center;
     }
 
-    
-    public function consultaCurso(){
+    // Muestra los cursos que tiene un profesor
+    public function consultaCurso()
+    {
         $profe = Teacher::find(1);
+
         return $profe->courses;
-    
-    }
-    public function create (){
-        $areas= Area::all();
-        $centers=  Training_center::all();
-     return view('teacher.create', compact('areas','centers'));
-
-
     }
 
-    public function store(Request $request){
+    // Lista de profesores
+    public function index()
+    {
+        $teachers = Teacher::all();
 
-    $teach = new Teacher();
-
-     $teach=Teacher::create($request->all());
-
-    return $teach;
+        return view('teacher.index', compact('teachers'));
     }
-     public function index(){
 
-    $teachers = Teacher::all();
-    return view('teacher.index',compact('teachers'));
+    // Mostrar un profesor
+    public function show($id)
+    {
+        $teachers = Teacher::find($id);
 
+        return view('teacher.show', compact('teachers'));
     }
-    public function show($id){
-    $teacher = Teacher::find($id);
-    return view ('teacher.show', compact('teacher'));
+
+    // Formulario para crear un profesor
+    public function create()
+    {
+        $areas = Area::all();
+        $training_centers = Training_center::all();
+
+        return view(
+            'teacher.create',
+            compact('areas', 'training_centers')
+        );
+    }
+
+    // Guardar profesor
+    public function store(Request $request)
+    {
+        $teacher = Teacher::create($request->all());
+
+        return redirect()->route('teacher.list');
+    }
+
+    // Formulario para editar profesor
+    public function edit(Teacher $teacher)
+    {
+        $areas = Area::all();
+        $training_centers = Training_center::all();
+
+        return view('teacher.edit',
+            compact('teacher', 'areas', 'training_centers')
+        );
+    }
+
+    // Actualizar profesor
+    public function update(Request $request, Teacher $teacher)
+    {
+        $teacher->update($request->all());
+
+        return redirect()->route('teacher.list');
+    }
+
+    // Eliminar profesor
+    public function destroy(Teacher $teacher)
+    {
+        $teacher->delete();
+
+        return redirect()->route('teacher.list');
+    }
 }
-
-}
-
-
 
 
