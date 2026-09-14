@@ -24,7 +24,7 @@ class AreaController extends Controller
     {
         $areas = Area::all();
 
-        return view('area.index', compact('areas'));
+        return response()->json($areas, 200);
     }
 
     public function show($id)

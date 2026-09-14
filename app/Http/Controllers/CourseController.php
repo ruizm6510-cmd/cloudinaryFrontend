@@ -59,7 +59,7 @@ class CourseController extends Controller
     {
         $courses = Course::all();
 
-        return view('course.index', compact('courses'));
+        return response()->json($courses, 200);
     }
 
     // Mostrar curso

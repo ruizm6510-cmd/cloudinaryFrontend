@@ -27,7 +27,7 @@ class TrainingCenterController extends Controller
     {
         $centers = Training_center::all();
 
-        return view('training_center.index', compact('centers'));
+        return response()->json($centers, 200);
     }
 
     // Mostrar un centro de formación

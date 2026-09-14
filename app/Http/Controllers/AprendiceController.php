@@ -57,7 +57,7 @@ class AprendiceController extends Controller
     {
         $aprendices = Aprendice::all();
 
-        return view('aprendice.index', compact('aprendices'));
+        return response()->json($aprendices, 200);
     }
 
     // Mostrar aprendiz
