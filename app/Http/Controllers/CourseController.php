@@ -49,9 +49,16 @@ class CourseController extends Controller
     // Guardar curso
     public function store(Request $request)
     {
-        $course = Course::create($request->all());
+        $validated = $request->validate([
+            'name' => 'required|string|max:100',
+            'day' => 'required|string|max:50',
+            'area_id' => 'required|exists:areas,id',
+            'training_center_id' => 'required|exists:training_centers,id',
+        ]);
 
-        return redirect()->route('course.list');
+        $course = Course::create($validated);
+
+        return response()->json($course, 201);
     }
 
     // Lista de cursos
@@ -65,9 +72,9 @@ class CourseController extends Controller
     // Mostrar curso
     public function show($id)
     {
-        $curso = Course::find($id);
+        $course = Course::findOrFail($id);
 
-        return view('course.show', compact('curso'));
+        return response()->json($course, 200);
     }
 
     // Editar curso
@@ -83,18 +90,29 @@ class CourseController extends Controller
     }
 
     // Actualizar curso
-    public function update(Request $request, Course $course)
+    public function update(Request $request,$id)
     {
-        $course->update($request->all());
+        $course = Course::findOrFail($id);
+        $validated = $request->validate([
+            'name' => 'required|string|max:100',
+            'day' => 'required|string|max:50',
+            'area_id' => 'required|exists:areas,id',
+            'training_center_id' => 'required|exists:training_centers,id',
+        ]);
 
-        return redirect()->route('course.list');
+        $course->update($validated);
+
+        return response()->json($course, 200);
     }
 
+    
+
     // Eliminar curso
-    public function destroy(Course $course)
+    public function destroy($id)
     {
+        $course = Course::findOrFail($id);
         $course->delete();
 
-        return redirect()->route('course.list');
+        return response()->json(['message' => 'Eliminado correctamente'], 200);
     }
 }

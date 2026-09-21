@@ -33,9 +33,9 @@ class TrainingCenterController extends Controller
     // Mostrar un centro de formación
     public function show($id)
     {
-        $centers = Training_center::find($id);
+        $center = Training_center::findOrFail($id);
 
-        return view('training_center.show', compact('centers'));
+        return response()->json($center, 200);
     }
 
     // Formulario para crear un centro
@@ -47,9 +47,14 @@ class TrainingCenterController extends Controller
     // Guardar un centro
     public function store(Request $request)
     {
-        $training_center = Training_center::create($request->all());
+        $validated = $request->validate([
+            'name' => 'required|string|max:100',
+            'location' => 'required|string|max:100',
+        ]);
 
-        return redirect()->route('training_center.list');
+        $center = Training_center::create($validated);
+
+        return response()->json($center, 201);
     }
 
     // Formulario para editar un centro
@@ -61,18 +66,23 @@ class TrainingCenterController extends Controller
     }
 
     // Actualizar un centro
-    public function update(Request $request, Training_center $training_center)
+    public function update(Request $request, $id)
     {
-        $training_center->update($request->all());
-
-        return redirect()->route('training_center.list');
+        $center = Training_center::findOrFail($id);
+        $validated = $request->validate([
+            'name' => 'required|string|max:100',
+            'location' => 'required|string|max:100',
+        ]);
+         $center->update($validated);
+        return response()->json($center, 200);
     }
 
     // Eliminar un centro
-    public function destroy(Training_center $training_center)
+    public function destroy($id)
     {
-        $training_center->delete();
+        $center = Training_center::findOrFail($id);
+        $center->delete();
 
-        return redirect()->route('training_center.list');
+        return response()->json(['message' => 'Eliminado correctamente'], 200);
     }
 }

@@ -48,8 +48,16 @@ class AprendiceController extends Controller
         $aprendiz->urlFoto = $nombreArchivo;
         $aprendiz->save();
 
-        return redirect()->route('aprendice.list');
+        $validated = $request->validate([
+            'name' => 'required|string|max:100',
+            'email' => 'required|email|unique:aprendices,email',
+            'course_id' => 'required|exists:courses,id',
+            'computer_id' => 'required|exists:computers,id',
+        ]);
 
+        $aprendiz = Aprendice::create($validated);
+
+        return response()->json($aprendiz, 201);
     }
 
     // Lista de aprendices
@@ -63,9 +71,9 @@ class AprendiceController extends Controller
     // Mostrar aprendiz
     public function show($id)
     {
-        $aprendiz = Aprendice::find($id);
+        $aprendice = Aprendice::findOrFail($id);
 
-        return view('aprendice.show', compact('aprendiz'));
+        return response()->json($aprendice, 200);
     }
 
     // Editar aprendiz
@@ -81,18 +89,26 @@ class AprendiceController extends Controller
     }
 
     // Actualizar aprendiz
-    public function update(Request $request, Aprendice $aprendice)
+    public function update(Request $request,$id)
     {
-        $aprendice->update($request->all());
+        $aprendice = Aprendice::findOrFail($id);
+        $validated = $request->validate([
+            'name' => 'required|string|max:100',
+            'email' => 'required|email|unique:aprendices,email,'.$aprendice->id,
+            'course_id' => 'required|exists:courses,id',
+            'computer_id' => 'required|exists:computers,id',
+        ]);
 
-        return redirect()->route('aprendice.list');
+        $aprendice->update($validated);
+
+        return response()->json($aprendice, 200);
     }
 
     // Eliminar aprendiz
-    public function destroy(Aprendice $aprendice)
-    {
+    public function destroy($id){
+     $aprendice = Aprendice::findOrFail($id);
         $aprendice->delete();
 
-        return redirect()->route('aprendice.list');
+        return response()->json(['message' => ' Eliminado correctamente'], 200);
     }
 }

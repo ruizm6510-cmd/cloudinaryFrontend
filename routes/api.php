@@ -24,9 +24,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::apiResource('areas', AreaController::class);
+
+
+
 Route::apiResource('computers', ComputerController::class);
 Route::apiResource('aprendices', AprendiceController::class);
 Route::apiResource('courses', CourseController::class);
 Route::apiResource('teachers', TeacherController::class);
-route::apiResource('training_centers', TrainingCenterController::class);
+Route::apiResource('training_centers', TrainingCenterController::class);
 

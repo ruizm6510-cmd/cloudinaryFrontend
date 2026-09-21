@@ -15,9 +15,12 @@ class AreaController extends Controller
 
     public function store(Request $request)
     {
-        $area = Area::create($request->all());
-
-        return redirect()->route('area.index');
+        $validated = $request->validate([
+            'name' => 'required|string|max:100',
+            
+        ]);
+        $area = Area::create($validated);
+        return response()->json($area, 201);
     }
 
     public function index()
@@ -29,9 +32,9 @@ class AreaController extends Controller
 
     public function show($id)
     {
-        $area = Area::find($id);
+        $area = Area::findOrFail($id);
 
-        return view('area.show', compact('area'));
+        return response()->json($area, 200);
     }
 
     public function edit(Area $area)
@@ -41,17 +44,23 @@ class AreaController extends Controller
         return view('area.edit', compact('area', 'aprendices'));
     }
 
-    public function update(Request $request, Area $area)
+    public function update(Request $request, $id)
     {
-        $area->update($request->all());
+        $area = Area::findOrFail($id);
+        $validated = $request->validate([
+            'name' => 'required|string|max:100',
+        ]);
 
-        return redirect()->route('area.index');
+        $area->update($validated);
+
+        return response()->json($area, 200);
     }
 
-    public function destroy(Area $area)
+    public function destroy($id)
     {
+        $area = Area::findOrFail($id);
         $area->delete();
 
-        return redirect()->route('area.index');
+        return response()->json(['message' => 'Eliminado correctamente'], 200);
     }
 }

@@ -44,9 +44,9 @@ class TeacherController extends Controller
     // Mostrar un profesor
     public function show($id)
     {
-        $teachers = Teacher::find($id);
+        $teacher = Teacher::findOrFail($id);
 
-        return view('teacher.show', compact('teachers'));
+        return response()->json($teacher, 200);
     }
 
     // Formulario para crear un profesor
@@ -64,9 +64,15 @@ class TeacherController extends Controller
     // Guardar profesor
     public function store(Request $request)
     {
-        $teacher = Teacher::create($request->all());
+        $validated = $request->validate([
+            'name' => 'required|string|max:100',
+            'email' => 'required|email|unique:teachers',
+            'area_id' => 'required|exists:areas,id',
+            'training_center_id' => 'required|exists:training_centers,id',
+        ]);
 
-        return redirect()->route('teacher.list');
+        $teacher = Teacher::create($validated);
+        return response()->json($teacher, 201);
     }
 
     // Formulario para editar profesor
@@ -81,20 +87,34 @@ class TeacherController extends Controller
     }
 
     // Actualizar profesor
-    public function update(Request $request, Teacher $teacher)
+    public function update(Request $request,$id)
     {
-        $teacher->update($request->all());
+        $teacher = Teacher::findOrFail($id);
+        $validated = $request->validate([
+            'name' => 'required|string|max:100',
+            'email' => 'required|email|unique:teachers,email,'.$teacher->id,
+            'area_id' => 'required|exists:areas,id',
+            'training_center_id' => 'required|exists:training_centers,id',
+        ]);
 
-        return redirect()->route('teacher.list');
+        $teacher->update($validated);
+
+        return response()->json($teacher, 200);
     }
+    
+        
+    
 
     // Eliminar profesor
-    public function destroy(Teacher $teacher)
+    public function destroy($id)
     {
+        $teacher = Teacher::findOrFail($id);
         $teacher->delete();
 
-        return redirect()->route('teacher.list');
+        return response()->json(['message' => 'Eliminado correctamente'], 200);
     }
+    
+       
 }
 
 

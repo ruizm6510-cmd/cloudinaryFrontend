@@ -31,7 +31,14 @@ class ComputerController extends Controller
         $compu->urlFoto = $nombreArchivo;
         $compu->save();
 
-        return redirect()->route('computer.list');
+        $validated = $request->validate([
+            'name' => 'required|integer',
+            'brand' => 'required|string|max:100',
+            'urlFoto' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+        $compu = Computer::create($validated);
+
+        return response()->json($compu, 201);
     }
 
     public function index()
@@ -43,9 +50,9 @@ class ComputerController extends Controller
 
     public function show($id)
     {
-        $computer = Computer::find($id);
+        $computer = Computer::findOrFail($id);
 
-        return view('computer.show', compact('computer'));
+        return response()->json($computer, 200);
     }
 
     public function edit(Computer $computer)
@@ -53,17 +60,26 @@ class ComputerController extends Controller
         return view('computer.edit', compact('computer'));
     }
 
-    public function update(Request $request, Computer $computer)
+    public function update(Request $request,$id)
     {
-        $computer->update($request->all());
+        $computer = Computer::findOrFail($id);
+        $validated = $request->validate([
+            'name' => 'required|integer',
+            'brand' => 'required|string|max:100',
+            'urlFoto' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
 
-        return redirect()->route('computer.list');
+        $computer->update($validated);
+
+        return response()->json($computer, 200);
     }
+    
 
-    public function destroy(Computer $computer)
+    public function destroy($id)
     {
+        $computer = Computer::findOrFail($id);
         $computer->delete();
 
-        return redirect()->route('computer.list');
+        return response()->json(['message' => 'Eliminado correctamente'], 200);
     }
 }
