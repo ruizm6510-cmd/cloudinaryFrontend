@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Computer;
+use Cloudinary\Cloudinary;
 
 class ComputerController extends Controller
 {
@@ -21,22 +22,37 @@ class ComputerController extends Controller
 
     public function store(Request $request)
     {
-        $compu = Computer::create($request->all());
-        //ADJUNTAR EL PDF
-        $file=$request->file("urlFoto");
-
-        $nombreArchivo = "foto_".time().".".$file->guessExtension();
-        $request->file('urlFoto')->storeAs('public/images', $nombreArchivo );
-
-        $compu->urlFoto = $nombreArchivo;
-        $compu->save();
-
-        $validated = $request->validate([
+        $request->validate([
             'name' => 'required|integer',
             'brand' => 'required|string|max:100',
-            'urlFoto' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'urlFoto' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:5120',
         ]);
-        $compu = Computer::create($validated);
+
+        $file = $request->file('urlFoto');
+
+        $cloudinary = new Cloudinary([
+            'cloud' => [
+                'cloud_name' => config('services.cloudinary.cloud_name'),
+                'api_key' => config('services.cloudinary.api_key'),
+                'api_secret' => config('services.cloudinary.api_secret'),
+            ],
+            'url' => ['secure' => true],
+        ]);
+
+        $resultado = $cloudinary->uploadApi()->upload(
+            $file->getRealPath(),
+            [
+                'folder' => 'computers',
+                'resource_type' => 'image',
+            ]
+        );
+
+        $compu = Computer::create([
+            'name' => $request->name,
+            'brand' => $request->brand,
+            'urlFoto' => $resultado['secure_url'],
+            'imagen_public_id' => $resultado['public_id'],
+        ]);
 
         return response()->json($compu, 201);
     }
@@ -60,20 +76,49 @@ class ComputerController extends Controller
         return view('computer.edit', compact('computer'));
     }
 
-    public function update(Request $request,$id)
+    public function update(Request $request, $id)
     {
         $computer = Computer::findOrFail($id);
-        $validated = $request->validate([
+        
+        $request->validate([
             'name' => 'required|integer',
             'brand' => 'required|string|max:100',
-            'urlFoto' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'urlFoto' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:5120',
         ]);
 
-        $computer->update($validated);
+        $data = [
+            'name' => $request->name,
+            'brand' => $request->brand,
+        ];
+
+        if ($request->hasFile('urlFoto')) {
+            $file = $request->file('urlFoto');
+
+            $cloudinary = new Cloudinary([
+                'cloud' => [
+                    'cloud_name' => config('services.cloudinary.cloud_name'),
+                    'api_key' => config('services.cloudinary.api_key'),
+                    'api_secret' => config('services.cloudinary.api_secret'),
+                ],
+                'url' => ['secure' => true],
+            ]);
+
+            $resultado = $cloudinary->uploadApi()->upload(
+                $file->getRealPath(),
+                [
+                    'folder' => 'computers',
+                    'resource_type' => 'image',
+                ]
+            );
+
+            $data['urlFoto'] = $resultado['secure_url'];
+            $data['imagen_public_id'] = $resultado['public_id'];
+        }
+
+        $computer->update($data);
 
         return response()->json($computer, 200);
     }
-    
 
     public function destroy($id)
     {
